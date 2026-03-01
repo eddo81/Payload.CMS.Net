@@ -4,7 +4,7 @@
 /// A structured error thrown on failed Payload CMS requests.
 /// <para>Captures the HTTP status code, the originating response,
 /// and an optional cause (e.g. parsed JSON error payload).</para>
-/// <para>Thrown by <see cref="Client"/> on non-2xx responses or
+/// <para>Thrown by <see cref="PayloadSDK"/> on non-2xx responses or
 /// fatal transport / parsing errors.</para>
 /// </summary>
 public class PayloadError : Exception
@@ -26,13 +26,7 @@ public class PayloadError : Exception
     /// <param name="message">Optional human-readable error message.</param>
     /// <param name="response">The originating HTTP response.</param>
     /// <param name="cause">The underlying cause — typically a parsed JSON error body.</param>
-    public PayloadError(
-        int statusCode,
-        string? message = null,
-        HttpResponseMessage? response = null,
-        object? cause = null)
-        : base(message ?? $"[PayloadError] Request failed with status: {statusCode}", cause as Exception)
-    {
+    public PayloadError(int statusCode, string? message = null, HttpResponseMessage? response = null, object? cause = null) : base(message ?? $"[PayloadError] Request failed with status: {statusCode}", cause as Exception) {
         StatusCode = statusCode;
         Response = response;
         Cause = cause;

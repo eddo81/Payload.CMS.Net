@@ -7,14 +7,14 @@
 
     <!-- Package identity — update when the library is renamed -->
     <PackageId>Payload.CMS</PackageId>
-    <Version>0.1.0</Version>
-    <Authors><!-- your name or org --></Authors>
-    <Copyright>Copyright © 2026 <!-- your name or org --></Copyright>
+    <Version>0.1.0-preview.1</Version>
+    <Authors>eddo81</Authors>
+    <Copyright>Copyright © 2026 eddo81</Copyright>
     <Description>A typed .NET REST client for the Payload CMS API.</Description>
     <PackageTags>payloadcms;cms;rest;api;http</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl><!-- https://github.com/your-org/your-repo --></RepositoryUrl>
-    <PackageProjectUrl><!-- https://github.com/your-org/your-repo --></PackageProjectUrl>
+    <RepositoryUrl>https://github.com/eddo81/Payload.CMS.Net</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/eddo81/Payload.CMS.Net</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <!-- Emit XML doc file so IntelliSense works for consumers -->
@@ -23,6 +23,10 @@
     <!-- Symbols for step-through debugging -->
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <!-- Source Link — embeds git commit info so consumers can step into source -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 
 
@@ -30,6 +34,12 @@
     <None Include="README.md" Pack="true" PackagePath="\" />
     <!-- Exclude the test project — it lives in a subfolder but belongs to a separate assembly -->
     <Compile Remove="Tests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.*" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.*" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.*" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>

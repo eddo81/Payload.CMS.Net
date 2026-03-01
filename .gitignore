@@ -30,6 +30,11 @@ msbuild.log
 msbuild.err
 msbuild.wrn
 
+# Test output
+TestResults/
+
 # Visual Studio 2015
 .vs/
 LIBRARY.md
+PLAN.md
+PROJECT_GUIDELINES.md

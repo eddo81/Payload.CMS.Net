@@ -5,7 +5,6 @@ using Payload.CMS.Public.Config;
 using Payload.CMS.Public.Models.Auth;
 using Payload.CMS.Public.Models.Collection;
 using Payload.CMS.Public.Upload;
-using System.Net.Http;
 using HttpMethod = Payload.CMS.Public.Enums.HttpMethod;
 
 namespace Payload.CMS.Public;
@@ -15,7 +14,7 @@ namespace Payload.CMS.Public;
 /// <para>Provides typed methods for <c>collections</c>, <c>globals</c>,
 /// <c>auth</c>, <c>versions</c>, and file uploads.</para>
 /// </summary>
-public class Client
+public class PayloadSDK
 {
     private string _baseUrl;
     private Dictionary<string, string> _headers = new();
@@ -26,23 +25,17 @@ public class Client
     private record RequestConfig(HttpMethod? Method = null, HttpContent? Body = null);
 
     /// <summary>
-    /// Initializes a new instance of <see cref="Client"/>.
+    /// Initializes a new instance of <see cref="PayloadSDK"/>.
     /// </summary>
     /// <param name="httpClient">
     /// The <see cref="HttpClient"/> instance to use for all requests.
     /// The caller is responsible for its lifetime and disposal.
     /// </param>
     /// <param name="baseUrl">The base URL of the Payload CMS instance (e.g. <c>https://cms.example.com</c>).</param>
-    /// <param name="headers">Optional custom headers merged into every request.</param>
-    public Client(HttpClient httpClient, string baseUrl, Dictionary<string, string>? headers = null)
+    public PayloadSDK(HttpClient httpClient, string baseUrl)
     {
         _httpClient = httpClient;
         _baseUrl = _NormalizeUrl(baseUrl);
-
-        if (headers != null)
-        {
-            SetHeaders(headers);
-        }
     }
 
     /// <summary>
@@ -211,6 +204,7 @@ public class Client
             }
 
             var response = await _httpClient.SendAsync(request, cancellationToken);
+            
             var text = await response.Content.ReadAsStringAsync(cancellationToken);
 
             if (text.Length > 0)
@@ -694,6 +688,7 @@ public class Client
         var method = HttpMethod.POST;
 
         var config = new RequestConfig(Method: method);
+
 
         var json = await _Fetch(url, config, cancellationToken) ?? new Dictionary<string, object?>();
         var dto = MessageDTO.FromJson(json);
