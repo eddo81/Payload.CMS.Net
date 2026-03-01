@@ -1,38 +1,52 @@
 # Payload CMS HTTP Client
 
-A lightweight, zero-dependency HTTP client for the [Payload CMS](https://payloadcms.com/) REST API. Built in C# (.NET 8.0) as part of a cross-language port alongside TypeScript and Dart implementations.
+A lightweight HTTP client for the [Payload CMS](https://payloadcms.com/) REST API. Built in C# (.NET 6.0 and .NET 8.0) as part of a cross-language port alongside TypeScript and Dart implementations.
 
 - Typed methods for collections, globals, auth, and versions
 - Fluent query builder with where clauses, joins, sorting, and pagination
 - File upload support via multipart form data
 - API key and JWT authentication
 - Custom endpoint escape hatch via `Request()`
-- No external dependencies
+- Optional ASP.NET Core DI integration via `AddPayloadSDK()`
 
 ## Installation
 
 ```bash
-dotnet add package Payload.CMS
+dotnet add package PayloadCMS.DotNet
 ```
 
 ## Usage
 
 ```csharp
-using Payload.CMS.Public;
+using PayloadCMS.DotNet;
 
 var httpClient = new System.Net.Http.HttpClient();
-var client = new Client(httpClient, "http://localhost:3000");
+var sdk = new PayloadSDK(httpClient, "http://localhost:3000");
 ```
 
-> **Note:** `Client` requires an externally managed `System.Net.Http.HttpClient` instance. The caller is responsible for its lifetime and disposal. In ASP.NET Core applications, use `IHttpClientFactory`.
+> **Note:** `PayloadSDK` requires an externally managed `System.Net.Http.HttpClient` instance. The caller is responsible for its lifetime and disposal. In ASP.NET Core applications, use `IHttpClientFactory` or the `AddPayloadSDK()` DI extension.
+
+### ASP.NET Core DI
+
+```csharp
+// Program.cs
+builder.Services.AddPayloadSDK("https://cms.example.com");
+
+// Or with custom HttpClient configuration:
+builder.Services.AddPayloadSDK("https://cms.example.com", httpClient =>
+{
+    httpClient.Timeout = TimeSpan.FromSeconds(30);
+});
+```
+
+Inject `PayloadSDK` directly into controllers or services — it is registered as a singleton backed by a named `IHttpClientFactory`-managed `HttpClient`.
 
 ### Constructor
 
 ```csharp
-new Client(
+new PayloadSDK(
     System.Net.Http.HttpClient httpClient,
-    string baseUrl,
-    Dictionary<string, string>? headers = null
+    string baseUrl
 )
 ```
 
@@ -40,7 +54,6 @@ new Client(
 |-----------|------|-------------|
 | `httpClient` | `HttpClient` | The HTTP client instance to use. Caller owns the lifetime. |
 | `baseUrl` | `string` | Payload CMS instance URL. Trailing slashes are stripped automatically. |
-| `headers` | `Dictionary<string, string>?` | Optional custom headers included with every request. |
 
 ### Set headers
 
@@ -188,7 +201,7 @@ new FileUpload(byte[] content, string fileName, string? mimeType = null)
 
 #### Example
 ```csharp
-using Payload.CMS.Public.Upload;
+using PayloadCMS.DotNet.Upload;
 
 var file = new FileUpload(
     content: File.ReadAllBytes("photo.png"),
@@ -475,31 +488,33 @@ MessageDTO result = await client.Unlock("users", new Dictionary<string, object?>
 ### JWT Authentication
 
 ```csharp
-using Payload.CMS.Public.Config;
+using PayloadCMS.DotNet;
+using PayloadCMS.DotNet.Config;
 
-var client = new Client(httpClient, "http://localhost:3000");
+var sdk = new PayloadSDK(httpClient, "http://localhost:3000");
 
 // Login to get a token
-LoginResultDTO loginResult = await client.Login("users", new Dictionary<string, object?>
+LoginResultDTO loginResult = await sdk.Login("users", new Dictionary<string, object?>
 {
     ["email"] = "user@example.com",
     ["password"] = "secret",
 });
 
 // Set the token on the client
-client.SetJwtAuth(new JwtAuth(loginResult.Token!));
+sdk.SetJwtAuth(new JwtAuth(loginResult.Token!));
 
 // Authenticated requests now include the Bearer token
-MeResultDTO me = await client.Me("users");
+MeResultDTO me = await sdk.Me("users");
 ```
 
 ### API Key Authentication
 
 ```csharp
-using Payload.CMS.Public.Config;
+using PayloadCMS.DotNet;
+using PayloadCMS.DotNet.Config;
 
-var client = new Client(httpClient, "http://localhost:3000");
-client.SetApiKeyAuth(new ApiKeyAuth("users", "your-api-key-here"));
+var sdk = new PayloadSDK(httpClient, "http://localhost:3000");
+sdk.SetApiKeyAuth(new ApiKeyAuth("users", "your-api-key-here"));
 ```
 
 #### `ApiKeyAuth`
@@ -609,30 +624,36 @@ DocumentDTO document = await client.RestoreGlobalVersion("site-settings", "versi
 Escape hatch for custom endpoints. Returns raw JSON instead of a DTO.
 
 ```csharp
-Task<Dictionary<string, object?>?> Request(
-    HttpMethod method,
-    string path,
-    Dictionary<string, object?>? body = null,
-    QueryBuilder? query = null
+Task<Dictionary<string, object?>?> Request(RequestConfig config, CancellationToken cancellationToken = default)
+```
+
+`RequestConfig` is a record that groups all request options:
+
+```csharp
+new RequestConfig(
+    Method: System.Net.Http.HttpMethod method,
+    Path: string path,
+    Body: Dictionary<string, object?>? body = null,
+    Query: QueryBuilder? query = null
 )
 ```
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `method` | `HttpMethod` | HTTP method (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`). |
-| `path` | `string` | URL path appended to base URL (e.g. `/api/custom-endpoint`). |
-| `body` | `Dictionary<string, object?>?` | Optional JSON request body. |
-| `query` | `QueryBuilder?` | Optional query parameters. |
+| `Method` | `System.Net.Http.HttpMethod` | HTTP method (e.g. `HttpMethod.Get`, `HttpMethod.Post`). |
+| `Path` | `string` | URL path appended to base URL (e.g. `/api/custom-endpoint`). |
+| `Body` | `Dictionary<string, object?>?` | Optional JSON request body. |
+| `Query` | `QueryBuilder?` | Optional query parameters. |
 
 #### Example
 ```csharp
-using Payload.CMS.Public.Enums;
+using PayloadCMS.DotNet.Config;
 
-Dictionary<string, object?>? result = await client.Request(
-    HttpMethod.POST,
-    "/api/custom-endpoint",
-    body: new Dictionary<string, object?> { ["key"] = "value" }
-);
+Dictionary<string, object?>? result = await sdk.Request(new RequestConfig(
+    Method: HttpMethod.Post,
+    Path: "/api/custom-endpoint",
+    Body: new Dictionary<string, object?> { ["key"] = "value" }
+));
 ```
 
 ---
@@ -645,8 +666,8 @@ Fluent builder for query parameters. All methods return `this` for chaining.
 
 #### Example
 ```csharp
-using Payload.CMS.Public;
-using Payload.CMS.Public.Enums;
+using PayloadCMS.DotNet;
+using PayloadCMS.DotNet.Enums;
 
 var query = new QueryBuilder()
     .Where("status", Operator.Equals, "published")
@@ -827,11 +848,11 @@ public class PayloadError : Exception
 | `Cause` | `object?` | The parsed JSON error body (if available). |
 
 ```csharp
-using Payload.CMS.Public;
+using PayloadCMS.DotNet;
 
 try
 {
-    DocumentDTO document = await client.FindById("posts", "nonexistent");
+    DocumentDTO document = await sdk.FindById("posts", "nonexistent");
 }
 catch (PayloadError ex)
 {
@@ -881,8 +902,12 @@ public enum Operator
 
 ### HttpMethod
 
-HTTP methods accepted by `Request()`:
+`Request()` accepts `System.Net.Http.HttpMethod` — the platform-native type, no custom enum needed:
 
 ```csharp
-public enum HttpMethod { GET, POST, PUT, PATCH, DELETE }
+HttpMethod.Get
+HttpMethod.Post
+HttpMethod.Put
+HttpMethod.Patch
+HttpMethod.Delete
 ```

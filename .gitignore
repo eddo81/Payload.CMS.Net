@@ -36,5 +36,5 @@ TestResults/
 # Visual Studio 2015
 .vs/
 LIBRARY.md
-PLAN.md
+TYPESCRIPT_BACKPORT.md
 PROJECT_GUIDELINES.md
