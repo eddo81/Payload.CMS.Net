@@ -96,13 +96,14 @@ void ClearAuth()
 Retrieves a paginated list of documents.
 
 ```csharp
-Task<PaginatedDocsDTO> Find(string slug, QueryBuilder? query = null)
+Task<PaginatedDocsDTO> Find(string slug, QueryBuilder? query = null, CancellationToken cancellationToken = default)
 ```
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `slug` | `string` | Collection slug. |
 | `query` | `QueryBuilder?` | Optional query parameters (where, sort, limit, etc.). |
+| `cancellationToken` | `CancellationToken` | Optional cancellation token. |
 
 #### Example
 ```csharp
@@ -122,7 +123,7 @@ PaginatedDocsDTO result = await client.Find("posts");
 Retrieves a single document by ID.
 
 ```csharp
-Task<DocumentDTO> FindById(string slug, string id, QueryBuilder? query = null)
+Task<DocumentDTO> FindById(string slug, string id, QueryBuilder? query = null, CancellationToken cancellationToken = default)
 ```
 
 | Parameter | Type | Description |
@@ -130,6 +131,7 @@ Task<DocumentDTO> FindById(string slug, string id, QueryBuilder? query = null)
 | `slug` | `string` | Collection slug. |
 | `id` | `string` | Document ID. |
 | `query` | `QueryBuilder?` | Optional query parameters. |
+| `cancellationToken` | `CancellationToken` | Optional cancellation token. |
 
 #### Example
 ```csharp
@@ -146,13 +148,14 @@ DocumentDTO document = await client.FindById("posts", "123");
 Returns the total count of documents matching an optional query.
 
 ```csharp
-Task<int> Count(string slug, QueryBuilder? query = null)
+Task<int> Count(string slug, QueryBuilder? query = null, CancellationToken cancellationToken = default)
 ```
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `slug` | `string` | Collection slug. |
 | `query` | `QueryBuilder?` | Optional query parameters to filter the count. |
+| `cancellationToken` | `CancellationToken` | Optional cancellation token. |
 
 #### Example
 ```csharp
@@ -166,7 +169,7 @@ int total = await client.Count("posts");
 Creates a new document. Supports file uploads on upload-enabled collections.
 
 ```csharp
-Task<DocumentDTO> Create(string slug, Dictionary<string, object?> data, FileUpload? file = null)
+Task<DocumentDTO> Create(string slug, Dictionary<string, object?> data, FileUpload? file = null, CancellationToken cancellationToken = default)
 ```
 
 | Parameter | Type | Description |
@@ -174,6 +177,7 @@ Task<DocumentDTO> Create(string slug, Dictionary<string, object?> data, FileUplo
 | `slug` | `string` | Collection slug. |
 | `data` | `Dictionary<string, object?>` | Document data. |
 | `file` | `FileUpload?` | Optional file to upload (for upload-enabled collections). |
+| `cancellationToken` | `CancellationToken` | Optional cancellation token. |
 
 #### Example
 ```csharp
@@ -220,7 +224,7 @@ DocumentDTO document = await client.Create("media", new Dictionary<string, objec
 Updates a single document by ID. Supports file replacement.
 
 ```csharp
-Task<DocumentDTO> UpdateById(string slug, string id, Dictionary<string, object?> data, FileUpload? file = null)
+Task<DocumentDTO> UpdateById(string slug, string id, Dictionary<string, object?> data, FileUpload? file = null, CancellationToken cancellationToken = default)
 ```
 
 | Parameter | Type | Description |
@@ -229,6 +233,7 @@ Task<DocumentDTO> UpdateById(string slug, string id, Dictionary<string, object?>
 | `id` | `string` | Document ID. |
 | `data` | `Dictionary<string, object?>` | Fields to update. |
 | `file` | `FileUpload?` | Optional replacement file. |
+| `cancellationToken` | `CancellationToken` | Optional cancellation token. |
 
 #### Example
 ```csharp
@@ -243,7 +248,7 @@ DocumentDTO document = await client.UpdateById("posts", "123", new Dictionary<st
 Bulk-updates all documents matching a query. Supports file uploads.
 
 ```csharp
-Task<PaginatedDocsDTO> Update(string slug, Dictionary<string, object?> data, QueryBuilder query, FileUpload? file = null)
+Task<PaginatedDocsDTO> Update(string slug, Dictionary<string, object?> data, QueryBuilder query, FileUpload? file = null, CancellationToken cancellationToken = default)
 ```
 
 | Parameter | Type | Description |
@@ -252,6 +257,7 @@ Task<PaginatedDocsDTO> Update(string slug, Dictionary<string, object?> data, Que
 | `data` | `Dictionary<string, object?>` | Fields to update on all matching documents. |
 | `query` | `QueryBuilder` | Query to select documents to update. |
 | `file` | `FileUpload?` | Optional file to upload. |
+| `cancellationToken` | `CancellationToken` | Optional cancellation token. |
 
 #### Example
 ```csharp
@@ -269,13 +275,14 @@ PaginatedDocsDTO result = await client.Update("posts", new Dictionary<string, ob
 Deletes a single document by ID.
 
 ```csharp
-Task<DocumentDTO> DeleteById(string slug, string id)
+Task<DocumentDTO> DeleteById(string slug, string id, CancellationToken cancellationToken = default)
 ```
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `slug` | `string` | Collection slug. |
 | `id` | `string` | Document ID. |
+| `cancellationToken` | `CancellationToken` | Optional cancellation token. |
 
 #### Example
 ```csharp
@@ -287,13 +294,14 @@ DocumentDTO document = await client.DeleteById("posts", "123");
 Bulk-deletes all documents matching a query.
 
 ```csharp
-Task<PaginatedDocsDTO> Delete(string slug, QueryBuilder query)
+Task<PaginatedDocsDTO> Delete(string slug, QueryBuilder query, CancellationToken cancellationToken = default)
 ```
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `slug` | `string` | Collection slug. |
 | `query` | `QueryBuilder` | Query to select documents to delete. |
+| `cancellationToken` | `CancellationToken` | Optional cancellation token. |
 
 #### Example
 ```csharp
@@ -312,7 +320,7 @@ PaginatedDocsDTO result = await client.Delete("posts", query);
 Retrieves a global document.
 
 ```csharp
-Task<DocumentDTO> FindGlobal(string slug)
+Task<DocumentDTO> FindGlobal(string slug, CancellationToken cancellationToken = default)
 ```
 
 #### Example
@@ -325,7 +333,7 @@ DocumentDTO document = await client.FindGlobal("site-settings");
 Updates a global document.
 
 ```csharp
-Task<DocumentDTO> UpdateGlobal(string slug, Dictionary<string, object?> data)
+Task<DocumentDTO> UpdateGlobal(string slug, Dictionary<string, object?> data, CancellationToken cancellationToken = default)
 ```
 
 #### Example
@@ -345,13 +353,14 @@ DocumentDTO document = await client.UpdateGlobal("site-settings", new Dictionary
 Authenticates a user and returns a JWT token.
 
 ```csharp
-Task<LoginResultDTO> Login(string slug, Dictionary<string, object?> data)
+Task<LoginResultDTO> Login(string slug, Dictionary<string, object?> data, CancellationToken cancellationToken = default)
 ```
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `slug` | `string` | Auth-enabled collection slug. |
 | `data` | `Dictionary<string, object?>` | Credentials (e.g. `{ email, password }`). |
+| `cancellationToken` | `CancellationToken` | Optional cancellation token. |
 
 #### Example
 ```csharp
@@ -372,7 +381,7 @@ LoginResultDTO result = await client.Login("users", new Dictionary<string, objec
 Retrieves the currently authenticated user.
 
 ```csharp
-Task<MeResultDTO> Me(string slug)
+Task<MeResultDTO> Me(string slug, CancellationToken cancellationToken = default)
 ```
 
 #### Example
@@ -391,7 +400,7 @@ MeResultDTO me = await client.Me("users");
 Refreshes the current JWT token.
 
 ```csharp
-Task<RefreshResultDTO> RefreshToken(string slug)
+Task<RefreshResultDTO> RefreshToken(string slug, CancellationToken cancellationToken = default)
 ```
 
 #### Example
@@ -408,7 +417,7 @@ RefreshResultDTO result = await client.RefreshToken("users");
 Initiates the forgot-password flow.
 
 ```csharp
-Task<MessageDTO> ForgotPassword(string slug, Dictionary<string, object?> data)
+Task<MessageDTO> ForgotPassword(string slug, Dictionary<string, object?> data, CancellationToken cancellationToken = default)
 ```
 
 #### Example
@@ -426,7 +435,7 @@ MessageDTO result = await client.ForgotPassword("users", new Dictionary<string, 
 Completes a password reset using a reset token.
 
 ```csharp
-Task<ResetPasswordResultDTO> ResetPassword(string slug, Dictionary<string, object?> data)
+Task<ResetPasswordResultDTO> ResetPassword(string slug, Dictionary<string, object?> data, CancellationToken cancellationToken = default)
 ```
 
 #### Example
@@ -446,7 +455,7 @@ ResetPasswordResultDTO result = await client.ResetPassword("users", new Dictiona
 Verifies a user's email address.
 
 ```csharp
-Task<MessageDTO> VerifyEmail(string slug, string token)
+Task<MessageDTO> VerifyEmail(string slug, string token, CancellationToken cancellationToken = default)
 ```
 
 #### Example
@@ -461,7 +470,7 @@ MessageDTO result = await client.VerifyEmail("users", "verification-token");
 Logs out the currently authenticated user.
 
 ```csharp
-Task<MessageDTO> Logout(string slug)
+Task<MessageDTO> Logout(string slug, CancellationToken cancellationToken = default)
 ```
 
 #### Example
@@ -474,7 +483,7 @@ MessageDTO result = await client.Logout("users");
 Unlocks a user account that has been locked due to failed login attempts.
 
 ```csharp
-Task<MessageDTO> Unlock(string slug, Dictionary<string, object?> data)
+Task<MessageDTO> Unlock(string slug, Dictionary<string, object?> data, CancellationToken cancellationToken = default)
 ```
 
 #### Example
@@ -544,7 +553,7 @@ Use `SetApiKeyAuth()` or `SetJwtAuth()` to apply credentials to the client, or `
 Retrieves a paginated list of versions for a collection.
 
 ```csharp
-Task<PaginatedDocsDTO> FindVersions(string slug, QueryBuilder? query = null)
+Task<PaginatedDocsDTO> FindVersions(string slug, QueryBuilder? query = null, CancellationToken cancellationToken = default)
 ```
 
 #### Example
@@ -557,7 +566,7 @@ PaginatedDocsDTO result = await client.FindVersions("posts");
 Retrieves a single version by ID.
 
 ```csharp
-Task<DocumentDTO> FindVersionById(string slug, string id)
+Task<DocumentDTO> FindVersionById(string slug, string id, CancellationToken cancellationToken = default)
 ```
 
 #### Example
@@ -570,7 +579,7 @@ DocumentDTO document = await client.FindVersionById("posts", "version-id");
 Restores a collection document to a specific version.
 
 ```csharp
-Task<DocumentDTO> RestoreVersion(string slug, string id)
+Task<DocumentDTO> RestoreVersion(string slug, string id, CancellationToken cancellationToken = default)
 ```
 
 #### Example
@@ -583,7 +592,7 @@ DocumentDTO document = await client.RestoreVersion("posts", "version-id");
 Retrieves a paginated list of versions for a global.
 
 ```csharp
-Task<PaginatedDocsDTO> FindGlobalVersions(string slug, QueryBuilder? query = null)
+Task<PaginatedDocsDTO> FindGlobalVersions(string slug, QueryBuilder? query = null, CancellationToken cancellationToken = default)
 ```
 
 #### Example
@@ -596,7 +605,7 @@ PaginatedDocsDTO result = await client.FindGlobalVersions("site-settings");
 Retrieves a single global version by ID.
 
 ```csharp
-Task<DocumentDTO> FindGlobalVersionById(string slug, string id)
+Task<DocumentDTO> FindGlobalVersionById(string slug, string id, CancellationToken cancellationToken = default)
 ```
 
 #### Example
@@ -609,7 +618,7 @@ DocumentDTO document = await client.FindGlobalVersionById("site-settings", "vers
 Restores a global document to a specific version.
 
 ```csharp
-Task<DocumentDTO> RestoreGlobalVersion(string slug, string id)
+Task<DocumentDTO> RestoreGlobalVersion(string slug, string id, CancellationToken cancellationToken = default)
 ```
 
 #### Example

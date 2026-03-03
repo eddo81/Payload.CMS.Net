@@ -14,8 +14,8 @@
     <Description>A typed .NET REST client for the Payload CMS API.</Description>
     <PackageTags>payloadcms;cms;rest;api;http</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/eddo81/Payload.CMS.Net</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/eddo81/Payload.CMS.Net</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/eddo81/PayloadCMS.DotNet</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/eddo81/PayloadCMS.DotNet</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <!-- Emit XML doc file so IntelliSense works for consumers -->
