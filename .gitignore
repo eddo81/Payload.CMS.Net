@@ -35,6 +35,7 @@ TestResults/
 
 # Visual Studio 2015
 .vs/
+nupkg/
 LIBRARY.md
 TYPESCRIPT_BACKPORT.md
 PROJECT_GUIDELINES.md
