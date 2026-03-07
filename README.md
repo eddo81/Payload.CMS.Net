@@ -779,22 +779,49 @@ PaginatedDocsDTO result = await client.Find("posts", query);
 
 The included DTOs represent the **lowest common denominator** of a Payload CMS response. Because Payload collections are schema-defined by the consumer, this library cannot know the shape of your documents at compile time. Instead, `DocumentDTO` captures the universal fields (`Id`, `CreatedAt`, `UpdatedAt`) and exposes the full response as a raw `Dictionary<string, object?>`.
 
-These DTOs are **not intended to be your final domain models**. They serve as a transport-level representation that you should map into richer, typed models in your own application:
+These DTOs are **not intended to be your final domain models**. They serve as a transport-level representation that you should map into richer, typed models in your own application.
+
+A convenient pattern is to write a `DocumentDTO` extension method using `System.Text.Json` — property names are matched case-insensitively by default, and `[JsonPropertyName]` can be used for explicit mappings:
 
 ```csharp
-// Your domain model
-record BlogPost(string Id, string Title, string Content, DateTime PublishedAt);
+using System.Text.Json;
+using PayloadCMS.DotNet.Models.Collection;
 
-// Map from DTO to your model
-BlogPost ToBlogPost(DocumentDTO dto) => new BlogPost(
-    Id: dto.Id,
-    Title: (string)dto.Json["title"]!,
-    Content: (string)dto.Json["content"]!,
-    PublishedAt: DateTime.Parse((string)dto.Json["publishedAt"]!)
-);
+public static class DocumentDTOExtensions
+{
+    private static readonly JsonSerializerOptions _options = new() { PropertyNameCaseInsensitive = true };
 
+    public static T As<T>(this DocumentDTO dto) where T : new()
+    {
+        var json = JsonSerializer.Serialize(dto.Json);
+        return JsonSerializer.Deserialize<T>(json, _options) ?? new T();
+    }
+}
+```
+
+Define your domain model — no attributes needed for fields whose names match the CMS field names (case-insensitively), and use `[JsonPropertyName]` only where an explicit mapping is required:
+
+```csharp
+public class BlogPost
+{
+    public string Id { get; set; }
+    public string Title { get; set; }
+    public string Content { get; set; }
+    public DateTime? CreatedAt { get; set; }
+    [JsonPropertyName("publishedAt")]
+    public DateTime? PublishedAt { get; set; }
+}
+```
+
+Then map from the DTO in a single call:
+
+```csharp
 DocumentDTO dto = await client.FindById("posts", "123");
-BlogPost post = ToBlogPost(dto);
+BlogPost post = dto.As<BlogPost>();
+
+// Works the same for paginated results:
+PaginatedDocsDTO result = await client.Find("posts");
+List<BlogPost> posts = result.Docs.Select(doc => doc.As<BlogPost>()).ToList();
 ```
 
 ### DocumentDTO
