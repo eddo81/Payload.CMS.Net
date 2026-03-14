@@ -33,7 +33,7 @@ Enums use `[StringValue("...")]` attribute + `EnumExtensions.ToStringValue()` ex
 
 ## Port Divergences
 - **HttpMethod**: TypeScript and Dart use a custom `HttpMethod` enum (no native type). C# uses `System.Net.Http.HttpMethod` (platform-native). This is a justified platform divergence — `HttpMethod` is NOT exported from the C# package.
-- **`RequestConfig`**: Public `sealed record` in `PayloadCMS.DotNet.Config`, used as the options object for `PayloadSDK.Request()`. Mirrors the TS inline options object `{ method, path, body?, query? }`. Private `Fetch` takes `(url, method?, body?)` directly — no private wrapper record.
+- **`RequestConfig`**: Public `sealed record` in `PayloadCMS.DotNet.Config`, used as the options object for `PayloadSDK.Request()`. Mirrors the TS inline options object `{ method, path, body?, query? }`. Private `Request` takes `(url, method?, body?)` directly — no private wrapper record.
 
 ## Code Style (enforced across all files)
 - **Always braces** on `if`, `foreach`, `for` — no bracketless one-liners, ever
